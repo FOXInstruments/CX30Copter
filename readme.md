@@ -1,7 +1,8 @@
 # CX30 Quadrocopter custom firmware
 
-IAR Workbench and PlatformIO STM8 C lang Quadrocopter project<br>
-Build on STM8S_StdPeriph_Lib v2.3.1
+C lang Quadrocopter custom firmware project<br>
+Control loops using High Order Sliding modes<br>
+Build on IAR Workbench or PlatformIO and STM8S_StdPeriph_Lib v2.3.1
 
 # Hardware specification
 Controller STM8S005K6T6C<br>
