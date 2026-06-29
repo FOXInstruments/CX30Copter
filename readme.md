@@ -1,12 +1,12 @@
 # CX30 Quadrocopter custom firmware
 IAR Workbench and PlatformIO STM8 C lang Quadrocopter project<br>
-Use STM8S_StdPeriph_Lib v2.3.1
+Build on STM8S_StdPeriph_Lib v2.3.1
 
 # Hardware specification
 Controller STM8S005K6T6C<br>
 HSI f_cpu=16MHz<br>
 Acceleration and Gyro chip MPU6052<br>
-RF Tranciver BK2425
+RF Transceiver BK2425
 
 ## CPU Pin configuration:
 PA1 - LED control. Active level High. After init flashes (period 300ms) while payload from remote control (BK2425) will be received. After it is on always<br>
