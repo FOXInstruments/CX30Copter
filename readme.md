@@ -1,8 +1,14 @@
+# CX30 Quadrocopter custom firmware
 IAR Workbench and PlatformIO STM8 C lang Quadrocopter project
 Use STM8S_StdPeriph_Lib v2.3.1
+
+# Hardware specification
 Controller STM8S005K6T6C
 HSI f_cpu=16MHz
-Pin configuration:
+Acceleration and Gyro chip MPU6052
+RF Tranciver BK2425
+
+## CPU Pin configuration:
 PA1 - LED control. Active level High. After init flashes (period 300ms) while payload from remote control (BK2425) will be received. After it is on always
 PB2 - Analog input ADC. Battery voltage from divider with ratio 42/(42+49)
 PB4 - I2C_SCL connected to MPU6052
@@ -17,8 +23,10 @@ PE5 - SPI_SS connected to BK2425
 PD0 - LED control. Active high level. Battery voltage > 3.2V - LED On. Battery voltage <= 3.2V - LED Flashes with period 500ms. Range 3.0V to 4.2V
 PD2 - PWM out for Left back motor (16KHz)
 PD3 - PWM out for Left front motor (16KHz)
+PD5, PD6 - UART telemetry data flow
 
-SPI
+
+## SPI BK2425
 STM8 is master
 clock 4MHz
 File with init sequence of chip BK2425: BK_Init.txt
@@ -32,46 +40,45 @@ SPI_CMD 0x61 (Read RX payload) 8 bytes:
 0x40 default value. Reserved
 0x40 default value. Right bottom rocker. Left button click -1, Right click +1 (0x0E - 0x72), Long Beep when cross 0x40. Value to adjust quadcopter roll orientation
 0x00 default value. 0x40 - Left upper 2nd button
-Pool rate: 330Hz when in Flight mode (payload received) and 20Hz after init and if there is no payload more than 10 requests
+Pool rate: 500Hz when in Flight mode (payload received) and 20Hz after init and if there is no payload more than 10 requests
 
-I2C
+## I2C MPU6052
 clock 200KHz
 File with init sequence of chip MPU6052: MPU_Init.txt
 Request data from MPU:
 1. 3 axis of Accel
-2. temperature
+2. Temperature
 3. 3 axis of Gyro
-Pool rate: 330Hz when in Flight mode (payload recived) and after init no Pool and if there is no payload from BK2425 more than 10 requests than stop MPU pool
+Pool rate: 500Hz when in Flight mode (payload recived) and after init no Pool and if there is no payload from BK2425 more than 10 requests than stop MPU pool
 
-Motors.
+## Motors
 PWM frequency 16kHz
 Normal flight duty cycle from 20% - 85%
 afterburner duty cycle from 85% - 95%
 
+# Firmware specification
 Use fixedpoint arithmetic.
 Sliding mode control loops.
+
+## Control loops
 1. Pitch control. Right stick X controls pitch angel (maximum angels +-30 deg).
-2. Roll control. Right stick Y controls roll angel (maximum angels +-30 deg).
-When stick is in dead zone +-3 from default value than target Roll = 0 and target Pitch = 0
+2. Roll control. Right stick Y controls roll angel (maximum angels +-30 deg). When stick is in dead zone +-3 from default value than target Roll = 0 and target Pitch = 0
+3. Sliding mode vertical speed control loop. Left stick uses to control it. Dead zone +-10 from default value. When Y pos in dead zone than keep vertival speed equal 0 (keep altitude)
 
-Sliding mode vertical speed control loop.
-Left stick uses to control it. Dead zone +-10 from default value.
-When Y pos in dead zone than keep vertival speed equal 0 (keep altitude)
-
-Calculate state of quadrocopter:
+## Calculate state of quadrocopter
 Roll, Pitch, Yaw - angels
 Wroll, Wpitch, Wyaw - angular speed
 x, y, z - center mass position (initial condition (0, 0, 0) takeoff point)
 Vx, Vy, Vz - center mass speed
 Ax, Ay, Az - center mass acceleration
 
-WiFi camera module.
+## WiFi camera module
 Link 65Mbs
 I = 250mA
 IP gateway = 172.16.10.1
 
-UART 19200
+## UART
+Baudrate 19200
 Add module to send state of quadrocoper, bk_payload, voltage on UART2 with frequency 1hz.
-pin PD5, PD6.
 Speeds 19200 and 56700 set through #define
 Use interrupt to free CPU
